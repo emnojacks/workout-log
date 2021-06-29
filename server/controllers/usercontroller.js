@@ -16,11 +16,11 @@ const bcrypt = require("bcryptjs");
 
 router.post('/register', async(req, res) => {
 
-    let { username, passwordhash } = req.body.user;
+    let { username, password } = req.body.user;
     try {
         const newUser = await User.create({
             username,
-            passwordhash: bcrypt.hashSync(passwordhash, 13),
+            password: bcrypt.hashSync(password, 13)
         });
         let token =
             //creates an object of id with value of User.id 
@@ -51,7 +51,7 @@ router.post('/register', async(req, res) => {
 //==================
 
 router.post("/login", async(req, res) => {
-    let { username, passwordhash } = req.body.user;
+    let { username, password } = req.body.user;
 
     try {
         //we await the data response and store it in an object called loginuser
@@ -66,7 +66,7 @@ router.post("/login", async(req, res) => {
         if (registeredUser) {
             //bcrypt compare method acceps 4 params - pswd string, hash, failure callback func, progress / resolution callback func,
             //if callback funcs ommitted there is a boolean returned in a promise - which is why we use await 
-            let passwordComparison = await bcrypt.compare(passwordhash, registeredUser.passwordhash);
+            let passwordComparison = await bcrypt.compare(password, registeredUser.password);
             if (passwordComparison) {
                 let token =
                     jwt.sign({ id: registeredUser.id }, process.env.JWT_SECRET, { expiresIn: "14d" });
